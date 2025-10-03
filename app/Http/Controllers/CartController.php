@@ -56,18 +56,17 @@ class CartController extends Controller
                 'qty' => 1,
             ]);
         }
-        $last_cart = DB::table('cart')
+        $cart_count = DB::table('cart')
             ->where('customer_id', $customer_id)
-            ->get();
+            ->count();
         return response()->json(
             [
                 'message' => 'Product added to cart',
-                'last_cart' => $last_cart
+                'cart_count' => $cart_count
             ]);
     }
 
-    public function addCartQty(Request $request)
-    {
+    public function addCartQty(Request $request){
         $cart_id = $request->input('cart_id');
         $cart = DB::table('cart')
             ->where('id', $cart_id)
@@ -81,8 +80,7 @@ class CartController extends Controller
         return redirect(route('cart_index'));
     }
 
-    public function removeCartQty(Request $request)
-    {
+    public function removeCartQty(Request $request){
         $cart_id = $request->input('cart_id');
         $cart = DB::table('cart')
             ->where('id', $cart_id)
@@ -96,8 +94,7 @@ class CartController extends Controller
         return redirect(route('cart_index'));
     }
 
-    public function deleteCartItem(Request $request)
-    {
+    public function deleteCartItem(Request $request){
         $cart_id = $request->input('cart_id');
         $cart = DB::table('cart')
             ->where('id', $cart_id)

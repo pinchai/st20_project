@@ -7,6 +7,7 @@
             <a
                 href="{{ route('cart_index') }}"
                 class="btn btn-sm btn-outline-dark rounded-pill"
+                id="cart_count"
             >Cart({{ $cart_count }})</a>
         </div>
 

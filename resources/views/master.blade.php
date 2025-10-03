@@ -91,6 +91,8 @@
                     product_id: product_id
                 })
                     .then(function (response) {
+                        let cart_count = response.data.cart_count;
+                        document.getElementById("cart_count").innerText = `Cart(${cart_count})`
                         Swal.fire({
                             position: "top-end",
                             icon: "success",
