@@ -13,7 +13,13 @@ class HomeController extends Controller
         $products = DB::table('product')
             ->select('*')
             ->get();
-        return view('home', ['products' => $products]);
+        $cart_count = DB::table('cart')
+            ->where('customer_id', 1)
+            ->count();
+        return view('home', [
+            'products' => $products,
+            'cart_count' => $cart_count
+        ]);
     }
 
     public function getById(Request $request)
