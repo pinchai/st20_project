@@ -45,18 +45,16 @@
                     <p class="mb-0 text-secondary">We provide quality products with a focus on simplicity and speed.</p>
                 </div>
                 <div class="col-md-4 mb-4 mb-md-0">
-                    <h6 class="text-uppercase text-muted small">Links</h6>
                     <ul class="list-unstyled mb-0">
                         <li><a href="/">Home</a></li>
-                        <li><a href="/product">Product</a></li>
-                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/cart">Cart</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4">
                     <h6 class="text-uppercase text-muted small">Contact</h6>
                     <ul class="list-unstyled mb-0 text-secondary">
-                        <li>Phone: +855 123 456 789</li>
-                        <li>Email: info@fake.com</li>
+                        <li>Phone: +855 99 775 967</li>
+                        <li>Email: pinchai.pc@gmail.com</li>
                     </ul>
                 </div>
             </div>
