@@ -54,3 +54,41 @@
         @endif
     </section>
 @endsection
+
+@section('script')
+    <script>
+        const {createApp} = Vue;
+        createApp({
+            delimiters: ['[[', ']]'],
+            data() {
+                return {}
+            },
+            methods: {
+                addToCart(product_id) {
+                    let url = "{{ url('/cart/add-to-cart') }}"
+                    $.LoadingOverlay("show");
+                    axios.post(url, {
+                        product_id: product_id
+                    })
+                        .then(function (response) {
+                            let cart_count = response.data.cart_count;
+                            document.getElementById("cart_count").innerText = `Cart(${cart_count})`
+                            Swal.fire({
+                                position: "top-end",
+                                icon: "success",
+                                title: "Product added to cart successfully!",
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        }).finally(function () {
+
+                        $.LoadingOverlay("hide");
+                    })
+                },
+            }
+        }).mount('#app');
+    </script>
+@endsection

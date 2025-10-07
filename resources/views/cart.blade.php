@@ -138,7 +138,8 @@
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 <span class="font-weight-bold">Total</span>
-                                <span class="font-weight-bold">${{ number_format(($total_price+$shipping_fee+$tax ?? 0), 2) }}</span>
+                                <span
+                                    class="font-weight-bold">${{ number_format(($total_price+$shipping_fee+$tax ?? 0), 2) }}</span>
                             </li>
                         </ul>
 
@@ -164,4 +165,107 @@
             </div>
         </div>
     </div>
+@endsection
+@section('script')
+    <script>
+        const {createApp} = Vue;
+        createApp({
+            delimiters: ['[[', ']]'],
+            data() {
+                return {
+                    cart_list: [],
+                    payment_form: {
+                        email: 'test@mail.com',
+                        phone: '85512345678',
+                        first_name: 'choeurn',
+                        last_name: 'pinchai',
+                        address: '123 Street',
+                        city: 'Phnom Penh',
+                        province: 'Phnom Penh',
+                        postal_code: '120000',
+                        payment_method: 'khqr',
+                        note: null,
+                    }
+                }
+            },
+            methods: {
+                addCartQty(cart_id) {
+                    let url = "{{ url('/cart/add-cart-qty') }}"
+                    $.LoadingOverlay("show");
+                    axios.post(url, {
+                        cart_id: cart_id
+                    })
+                        .then(function (response) {
+                            window.location.reload();
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        }).finally(function () {
+
+                        $.LoadingOverlay("hide");
+                    })
+                },
+                removeCartQty(cart_id) {
+                    let url = "{{ url('/cart/remove-cart-qty') }}"
+                    $.LoadingOverlay("show");
+                    axios.post(url, {
+                        cart_id: cart_id
+                    })
+                        .then(function (response) {
+                            window.location.reload();
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        }).finally(function () {
+
+                        $.LoadingOverlay("hide");
+                    })
+                },
+                deleteCartItem(cart_id) {
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You won't be able to revert this!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            let url = "{{ url('/cart/delete-cart-item') }}"
+                            $.LoadingOverlay("show");
+                            axios.post(url, {
+                                cart_id: cart_id
+                            })
+                                .then(function (response) {
+                                    window.location.reload();
+                                })
+                                .catch(function (error) {
+                                    console.log(error);
+                                }).finally(function () {
+
+                                $.LoadingOverlay("hide");
+                            })
+                        }
+                    });
+                },
+                toggleCartItemSelection(cart_id) {
+                    let url = "{{ url('/cart/toggleCartItemSelection') }}"
+                    $.LoadingOverlay("show");
+                    axios.post(url, {
+                        cart_id: cart_id
+                    })
+                        .then(function (response) {
+                            window.location.reload();
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        }).finally(function () {
+
+                        $.LoadingOverlay("hide");
+                    })
+                },
+            }
+        }).mount('#app');
+    </script>
 @endsection

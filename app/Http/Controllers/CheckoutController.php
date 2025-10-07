@@ -12,10 +12,29 @@ class CheckoutController extends Controller
     //
     public function index(Request $request)
     {
-        $products = DB::table('product')
-            ->select('*')
+        $cart = DB::table('cart')
+            ->join('product', 'cart.product_id', '=', 'product.id')
+            ->where('customer_id', 1)
+            ->where('cart.selected', 1)
+            ->select(
+                'product.*',
+                'cart.qty',
+                'cart.id as cart_id',
+                'cart.selected as selected'
+            )
             ->get();
-        return view('checkout', ['products' => $products]);
+        $total_price = 0;
+        $shipping_fee = 1.5;
+        foreach ($cart as $item) {
+            if ($item->selected === 1) {
+                $total_price += $item->price * $item->qty;
+            }
+        }
+        return view('checkout', [
+            'cart' => $cart,
+            'total_price' => $total_price,
+            'shipping_fee' => $shipping_fee,
+        ]);
     }
 
 
