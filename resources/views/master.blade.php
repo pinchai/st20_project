@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     {{-- Theme --}}
     <link rel="stylesheet" href="{{ asset('style.css') }}">
+    <link rel="stylesheet" href="{{ asset('qrcode.css') }}">
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
 <div id="app" class="d-flex flex-column min-vh-100">
@@ -58,10 +59,12 @@
                     </ul>
                 </div>
             </div>
+
             <div class="text-center mt-4 small text-muted">&copy; {{ date('Y') }} Your Company. All rights reserved.
             </div>
         </div>
     </footer>
+
 </div>
 
 {{-- Core JS --}}
@@ -73,6 +76,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script
     src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 @yield('script')
 </body>
 </html>

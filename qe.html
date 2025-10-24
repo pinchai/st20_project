@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Vue 2 QR Code (CDN)</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        .container {
+            max-width: 480px;
+            margin: 40px auto;
+            font-family: Arial
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 8px
+        }
+
+        button {
+            padding: 8px 12px;
+            margin-right: 6px
+        }
+
+        #qrcode canvas {
+            width: 100% !important;
+            height: auto !important
+        }
+    </style>
+</head>
+<body>
+<div id="app" class="container">
+    <h3>Vue 2 QR Code (CDN)</h3>
+    <input v-model="text" placeholder="Type text / URL to convert to QR"/>
+    <div>
+        <button @click="render">Generate</button>
+        <button @click="download" :disabled="!hasQRCode">Download PNG</button>
+        <button @click="clear">Clear</button>
+    </div>
+
+    <div id="qrcode" style="margin-top:16px"></div>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                text: 'https://example.com',
+                qrcodeObj: null
+            }
+        },
+        computed: {
+            hasQRCode() {
+                return !!this.qrcodeObj
+            }
+        },
+        methods: {
+            render() {
+                // remove previous
+                const container = document.getElementById('qrcode')
+                container.innerHTML = ''
+                // Create QRCode (qrcodejs) - size & colors are configurable
+                this.qrcodeObj = new QRCode(container, {
+                    text: this.text || '',
+                    width: 256,
+                    height: 256,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H // L, M, Q, H
+                })
+            },
+            download() {
+                // qrcodejs renders canvas or table depending on browser — handle canvas case
+                const canvas = document.querySelector('#qrcode canvas')
+                if (!canvas) return alert('No QR code to download')
+                const url = canvas.toDataURL('image/png')
+                const a = document.createElement('a')
+                a.href = url
+                a.download = 'qrcode.png'
+                a.click()
+            },
+            clear() {
+                document.getElementById('qrcode').innerHTML = ''
+                this.qrcodeObj = null
+            }
+        },
+        mounted() {
+            this.render()
+        }
+    })
+</script>
+</body>
+</html>

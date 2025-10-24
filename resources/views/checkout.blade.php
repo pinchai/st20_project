@@ -2,6 +2,63 @@
 @section('title','Checkout — Sample Store')
 
 @section('content')
+    <!-- Modal -->
+    <div
+        class="modal fade"
+        id="qrcode_modal"
+        data-backdrop="static"
+        data-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">KHQR</h5>
+                </div>
+                <div class="modal-body">
+                    <center>
+                        <div class="ticket" role="region" aria-label="KHQR ticket">
+                            <div class="head">
+                                <div class="logo">KHQR</div>
+                            </div>
+
+                            <div class="content">
+                                <div class="company">[[ merchantName ]]</div>
+                                <div class="amount-row" aria-hidden="false">
+                                    <div class="amount">[[ amount ]]</div>
+                                    <div class="currency">[[ currency ]]</div>
+                                </div>
+                                <br>
+                                <div class="timer" id="countdown">05:00</div>
+                            </div>
+
+                            <div class="divider" aria-hidden="true"></div>
+
+                            <div class="qr-wrap">
+                                <!-- Put your QR image filename here (qrcode.png) -->
+                                <div id="qrcode" style="margin-top:16px"></div>
+                            </div>
+                        </div>
+                    </center>
+                </div>
+                <div class="modal-footer">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        @click="closeModal()"
+                    >Close
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                    >Paid
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container py-4">
         <div class="row">
             {{-- Left: Customer / Shipping / Payment --}}
@@ -208,6 +265,9 @@
         const {createApp} = Vue;
         createApp({
             delimiters: ['[[', ']]'],
+            mounted() {
+                // this.render()
+            },
             data() {
                 return {
                     payment_form: {
@@ -221,17 +281,114 @@
                         postal_code: '120000',
                         payment_method: 'khqr',
                         note: null,
-                    }
+                        timer: null,
+                        countdown: null
+                    },
+                    amount: null,
+                    currency: null,
+                    merchantName: null,
                 }
             },
             methods: {
+                renderQr(text) {
+                    // remove previous
+                    const container = document.getElementById('qrcode')
+                    container.innerHTML = ''
+                    // Create QRCode (qrcodejs) - size & colors are configurable
+                    this.qrcodeObj = new QRCode(container, {
+                        text: text,
+                        width: 256,
+                        height: 256,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H // L, M, Q, H
+                    })
+                },
                 placeOrder() {
                     if (this.payment_form.payment_method === 'khqr') {
-                        alert('KHQR payment method is not supported yet.')
+                        let url = "{{ url('/checkout/generate-qr') }}"
+                        let input = this.payment_form
+                        let vm = this
+                        $.LoadingOverlay("show");
+                        axios.post(url, input)
+                            .then(function (response) {
+                                let res = response.data
+                                let qr_string = res.qr.data;
+                                vm.renderQr(qr_string.qr)
+                                vm.openModal()
+
+                                vm.amount = res.amount
+                                vm.currency = res.currency
+                                vm.merchantName = res.merchantName
+
+                                //polling check
+                                vm.timer = setInterval(() => {
+                                    axios.post('/check_payment_status', {
+                                        md5: qr_string.md5,
+                                    })
+                                        .then(function (res) {
+                                            if (res.data.data == null) {
+                                                console.log('waiting scanning...');
+                                            } else {
+                                                vm.closeModal();
+                                                clearInterval(vm.timer);
+                                                window.location.href = '/customer-thank';
+                                            }
+                                        })
+                                        .catch(function (err) {
+                                            console.log(err);
+                                            clearInterval(vm.timer);
+                                        });
+                                }, 3000);
+
+                                // countdown timer
+                                let timeLeft = 5 * 60;
+                                const countdownElement = document.getElementById('countdown');
+                                vm.countdown = setInterval(() => {
+                                    // Calculate minutes and seconds
+                                    const minutes = Math.floor(timeLeft / 60);
+                                    const seconds = timeLeft % 60;
+
+                                    // Format with leading zeros (e.g., 04:09)
+                                    const formattedMinutes = minutes.toString().padStart(2, '0');
+                                    const formattedSeconds = seconds.toString().padStart(2, '0');
+
+                                    // Display the time
+                                    countdownElement.textContent = `${formattedMinutes}:${formattedSeconds}`;
+
+                                    // When time runs out
+                                    if (timeLeft <= 0) {
+                                        clearInterval(vm.countdown);
+                                        clearInterval(vm.timer);
+                                        vm.closeModal();
+
+                                        countdownElement.textContent = "Expired";
+                                        countdownElement.classList.add("expired");
+                                    }
+
+                                    // Decrease time
+                                    timeLeft--;
+                                }, 1000);
+
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            }).finally(function () {
+
+                            $.LoadingOverlay("hide");
+                        })
                     } else {
                         alert('Caseh on Delivery payment method is not supported yet.')
                     }
-                }
+                },
+                openModal() {
+                    $('#qrcode_modal').modal('show');
+                },
+                closeModal() {
+                    $('#qrcode_modal').modal('hide');
+                    clearInterval(this.timer)
+                    clearInterval(this.countdown)
+                },
             }
         }).mount('#app');
     </script>
