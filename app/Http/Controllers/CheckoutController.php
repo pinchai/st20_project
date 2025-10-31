@@ -68,6 +68,7 @@ class CheckoutController extends Controller
     public function generateQr(Request $request)
     {
         $total_price = $this->totalPrice();
+        $total_price = $total_price - 1.5;
         $individualInfo = new IndividualInfo(
             bakongAccountID: 'choeurn_pinchai@aclb',
             merchantName: 'PINCHAI CHOEURN',

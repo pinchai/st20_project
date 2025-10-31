@@ -323,7 +323,8 @@
 
                                 //polling check
                                 vm.timer = setInterval(() => {
-                                    axios.post('/check_payment_status', {
+                                    let check_url = "{{ url('/check_payment_status') }}"
+                                    axios.post(check_url, {
                                         md5: qr_string.md5,
                                     })
                                         .then(function (res) {
@@ -332,7 +333,7 @@
                                             } else {
                                                 vm.closeModal();
                                                 clearInterval(vm.timer);
-                                                window.location.href = '/customer-thank';
+                                                window.location.href = "{{ url('/customer-thank') }}";
                                             }
                                         })
                                         .catch(function (err) {
